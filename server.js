@@ -36,7 +36,7 @@ app.get("/", async (req, res) => {
 });
 
 
-// APIs
+// API users
 app.get("/v1/users", async (req,res) => {
     const userId = req.query.id;
     const resp = await fetch(`https://users.roblox.com/v1/users/${userId}`);
@@ -54,8 +54,26 @@ app.get("/v1/users/username-history", async (req,res) => {
 })
 
 app.get("/v1/users/search", async (req,res) => {
+    const txt = req.query.txt;
+    const limit = Number(req.query.limit);
+
+    if (req.query.limit > 500) {
+      return res.status(308).send("Limit too high.");
+    }
     
-})
+    const data = await searchUsers(txt, limit);
+    res.json(data);
+});
+
+// API games
+app.get("/v1/games", async (req,res) => {
+  const gameId = Number(req.query.universeId);
+
+  const resp = await fetch(`https://games.roblox.com/v1/games?universeIds=${gameId}`);
+  const data = await resp.json();
+  
+  res.json(data);
+});
 
 // Host it
 const PORT = process.env.PORT || 3000;
