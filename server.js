@@ -2,6 +2,33 @@ const express = require("express");
 
 const app = express();
 
+// AI Help
+async function searchUsers(keyword, amount) {
+  let users = [];
+  let cursor = "";
+
+  while (users.length < amount) {
+    const url = new URL("https://users.roblox.com/v1/users/search");
+    url.searchParams.set("keyword", keyword);
+    url.searchParams.set("limit", "50");
+
+    if (cursor) {
+      url.searchParams.set("cursor", cursor);
+    }
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    users.push(...data.data);
+
+    cursor = data.nextPageCursor;
+
+    if (!cursor) break; // no more results
+  }
+
+  return users.slice(0, amount);
+}
+
 // Website
 app.get("/", async (req, res) => {
     res.sendFile(path.join(__dirname, "web", "index.html"));
