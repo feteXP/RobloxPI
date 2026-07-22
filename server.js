@@ -75,6 +75,22 @@ app.get("/v1/games", async (req,res) => {
   res.json(data);
 });
 
+app.get("/v1/games/votes", async (req,res) => {
+  const gameId = Number(req.query.universeId);
+  const resp = await fetch(`https://games.roblox.com/v1/games/votes?universeIds=${gameId}`);
+
+  const data = await resp.json();
+  res.json(data);
+});
+
+app.get("/v1/games/thumbnails", async (req,res) => {
+  const gameId = req.query.universeId;
+  const resp = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${gameId}&size=512x512&format=Png`)
+
+  const data = await resp.json();
+  res.json(data);
+})
+
 // Host it
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
