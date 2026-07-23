@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 
 const app = express();
 
@@ -32,7 +33,6 @@ async function searchUsers(keyword, amount) {
 // Website
 app.get("/", async (req, res) => {
     res.sendFile(path.join(__dirname, "web", "index.html"));
-    res.sendFile(path.join(__dirname, "web", "style.css"));
 });
 
 
@@ -41,14 +41,22 @@ app.get("/v1/users", async (req,res) => {
     const userId = req.query.id;
     const resp = await fetch(`https://users.roblox.com/v1/users/${userId}`);
 
+    if (!userId) {
+        return res.status(400).send("Invalid user ID.");
+    }
+  
     const data = await resp.json();
     res.json(data);
 })
 
 app.get("/v1/users/username-history", async (req,res) => {
     const userId = req.query.id; 
-    const resp = await fetch(`Ghttps://users.roblox.com/v1/users/${userId}/username-history`);
+    const resp = await fetch(`https://users.roblox.com/v1/users/${userId}/username-history`);
 
+    if (!userId) {
+        return res.status(400).send("Invalid user ID.");
+    }
+  
     const data = await resp.json();
     res.json(data);
 })
@@ -60,6 +68,9 @@ app.get("/v1/users/search", async (req,res) => {
     if (req.query.limit > 500) {
       return res.status(308).send("Limit too high.");
     }
+    if (!limit) {
+        return res.status(400).send("Invalid user ID.");
+    }
     
     const data = await searchUsers(txt, limit);
     res.json(data);
@@ -69,6 +80,9 @@ app.get("/v1/users/search", async (req,res) => {
 app.get("/v1/games", async (req,res) => {
   const gameId = Number(req.query.universeId);
 
+  if (!gameId) {
+    return res.status(400).send("Invalid user ID.");
+  }
   const resp = await fetch(`https://games.roblox.com/v1/games?universeIds=${gameId}`);
   const data = await resp.json();
   
@@ -79,14 +93,21 @@ app.get("/v1/games/votes", async (req,res) => {
   const gameId = Number(req.query.universeId);
   const resp = await fetch(`https://games.roblox.com/v1/games/votes?universeIds=${gameId}`);
 
+  if (!gameId) {
+    return res.status(400).send("Invalid user ID.");
+  }
   const data = await resp.json();
   res.json(data);
 });
 
 app.get("/v1/games/thumbnails", async (req,res) => {
-  const gameId = req.query.universeId;
+  const gameId = Number(req.query.universeId);
   const resp = await fetch(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${gameId}&size=512x512&format=Png`)
 
+  if (!gameId) {
+    return res.status(400).send("Invalid user ID.");
+  }
+  
   const data = await resp.json();
   res.json(data);
 })
